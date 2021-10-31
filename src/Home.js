@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import Book from './Book';
 
-function Home(props) {
+import { SHELVES } from './constants';
+
+function Home({ books, onChangeShelf }) {
   return (
     <div className='list-books'>
       <div className='list-books-title'>
@@ -9,48 +11,22 @@ function Home(props) {
       </div>
       <div className='list-books-content'>
         <div>
-          <div className='bookshelf'>
-            <h2 className='bookshelf-title'>Currently Reading</h2>
-            <div className='bookshelf-books'>
-              <ol className='books-grid'>
-                <li>
-                  <Book />
-                </li>
-                <li>
-                  <Book />
-                </li>
-              </ol>
+          {SHELVES.map(({ id, name }) => (
+            <div className='bookshelf' key={id}>
+              <h2 className='bookshelf-title'>{name}</h2>
+              <div className='bookshelf-books'>
+                <ol className='books-grid'>
+                  {books
+                    .filter(({ shelf }) => shelf === id)
+                    .map((book) => (
+                      <li key={book.id}>
+                        <Book book={book} onChangeShelf={onChangeShelf} />
+                      </li>
+                    ))}
+                </ol>
+              </div>
             </div>
-          </div>
-          <div className='bookshelf'>
-            <h2 className='bookshelf-title'>Want to Read</h2>
-            <div className='bookshelf-books'>
-              <ol className='books-grid'>
-                <li>
-                  <Book />
-                </li>
-                <li>
-                  <Book />
-                </li>
-              </ol>
-            </div>
-          </div>
-          <div className='bookshelf'>
-            <h2 className='bookshelf-title'>Read</h2>
-            <div className='bookshelf-books'>
-              <ol className='books-grid'>
-                <li>
-                  <Book />
-                </li>
-                <li>
-                  <Book />
-                </li>
-                <li>
-                  <Book />
-                </li>
-              </ol>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
       <div className='open-search'>
