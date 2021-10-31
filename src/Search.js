@@ -1,6 +1,23 @@
+import * as BooksAPI from './BooksAPI';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Book from './Book';
 
-function Search(props) {
+function Search({ booksOnShelves, onChangeShelf }) {
+  const [query, setQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (query) {
+        const books = await BooksAPI.search(query);
+        setSearchResults(books.error ? [] : books);
+      } else {
+        setSearchResults([]);
+      }
+    };
+    fetchResults();
+  }, [query]);
   return (
     <div className='search-books'>
       <div className='search-books-bar'>
@@ -16,11 +33,27 @@ function Search(props) {
                   However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
                   you don't find a specific author or title. Every search is limited by search terms.
                 */}
-          <input type='text' placeholder='Search by title or author' />
+          <input
+            type='text'
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder='Search by title or author'
+          />
         </div>
       </div>
       <div className='search-books-results'>
-        <ol className='books-grid'></ol>
+        <ol className='books-grid'>
+          {searchResults.map((book) => {
+            const shelf = booksOnShelves.find(
+              ({ id }) => book.id === id
+            )?.shelf;
+            return (
+              <li key={book.id}>
+                <Book book={{ ...book, shelf }} onChangeShelf={onChangeShelf} />
+              </li>
+            );
+          })}
+        </ol>
       </div>
     </div>
   );
