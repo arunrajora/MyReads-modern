@@ -1,23 +1,25 @@
 import * as BooksAPI from './BooksAPI';
-import { useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Book from './Book';
+import { debounce } from 'lodash';
 
 function Search({ booksOnShelves, onChangeShelf }) {
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-
-  useEffect(() => {
-    const fetchResults = async () => {
-      if (query) {
-        const books = await BooksAPI.search(query);
+  const fetchResults = useRef(
+    debounce(async (searchQuery) => {
+      if (searchQuery) {
+        const books = await BooksAPI.search(searchQuery);
         setSearchResults(books.error ? [] : books);
       } else {
         setSearchResults([]);
       }
-    };
-    fetchResults();
-  }, [query]);
+    }, 300)
+  );
+  useEffect(() => {
+    fetchResults.current(query);
+  }, [fetchResults, query]);
   return (
     <div className='search-books'>
       <div className='search-books-bar'>
